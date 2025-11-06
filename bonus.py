@@ -1,6 +1,7 @@
 from core.player import Player
 from core.orc import Orc
 from core.goblin import Goblin
+from core.boss import Boss
 import random
 import time
 
@@ -44,6 +45,13 @@ class Game:
             return self.create_orc()
         else:
             return self.create_goblin()
+    
+    def create_boss(self):
+        random_num = random.randint
+        weapon = ['sword','dagger','axe'][random_num(0,2)]
+        
+        return Boss('the boss',55,random_num(0,10),random_num(10,20),random_num(2,13),weapon)
+    
     
     def create_orc(self):
         random_num = random.randint
@@ -107,8 +115,7 @@ class Game:
                     print(f'game over ,winner: {deffendr.__dict__}, looser: {attacker.__dict__}')
                     playing = False
                     Game.playing_in_maze = False
-                    
-            
+             
             # swap attacker/deffender      
             else:
                 attacker,deffendr = deffendr,attacker
@@ -167,12 +174,13 @@ class Game:
                     if deffendr.type == 'goblin' and 0 < deffendr.hp < 10:
                         print('entering maze')
                         maze = [None for _ in range(8)]
-                        for i in range(len(maze)):
+                        for i in range(len(maze)-1):
                             random_num = random.randint(1,2)
                             if i % random_num == 0:
                                 maze[i] = self.create_orc()
                             else:
                                 maze[i] = self.create_goblin()
+                        maze[-1] = self.create_boss()
                         
                         for monster in maze:
                             if Game.playing_in_maze:
