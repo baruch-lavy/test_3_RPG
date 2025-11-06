@@ -60,7 +60,60 @@ class Game:
     def roll_dice(self,sides):
         return random.randint(1,sides)
         
-    
+    playing_in_maze = True
+    def maze_buttle(self,attacker:Orc | Goblin,deffendr:Orc | Goblin):
+        playing = True
+          
+        while playing:
+            print(f'the attacker is {attacker.name}')  
+            print(f'the deffender is {deffendr.name}')  
+            time.sleep(2) 
+            
+            # attach logic
+            attack = attacker.speed + self.roll_dice(20)
+            print(f'the attack is {attack}')
+            time.sleep(1.5)
+            
+            if attack > deffendr.armor_rating:
+                print('hit!')
+                
+                # calculating damage
+                damage = attacker.power + self.roll_dice(6)
+                
+                # checking is the attacker is monster
+                if hasattr(attacker,'type'):
+                    if attacker.weapon == 'dagger':
+                        damage *= 0.5
+                    elif attacker.weapon == 'sword':
+                        damage *= 1
+                    else:
+                        damage *= 1.5
+                print(f' the damage is {damage}')
+                time.sleep(1.5)
+                
+                # reducing deffender hp
+                deffendr.hp -= damage
+                print(f' current deffender hp  is {deffendr.hp}')
+                print()
+                time.sleep(1.5)
+                
+                # checking winner/looser
+                if deffendr.hp <= 0:
+                    print(f'game over ,winner: {attacker.__dict__}, looser: {deffendr.__dict__}')
+                    playing = False
+                    Game.playing_in_maze = False
+                    
+                if attacker.hp <= 0:
+                    print(f'game over ,winner: {deffendr.__dict__}, looser: {attacker.__dict__}')
+                    playing = False
+                    Game.playing_in_maze = False
+                    
+            
+            # swap attacker/deffender      
+            else:
+                attacker,deffendr = deffendr,attacker
+
+        
     def battle(self,player:Player,monster:Orc | Goblin):
         
         # rolling dice
@@ -110,9 +163,28 @@ class Game:
                 print()
                 time.sleep(1.5)
                 
+                if hasattr(deffendr,'type'):
+                    if deffendr.type == 'goblin' and 0 < deffendr.hp < 10:
+                        print('entering maze')
+                        maze = [None for _ in range(8)]
+                        for i in range(len(maze)):
+                            random_num = random.randint(1,2)
+                            if i % random_num == 0:
+                                maze[i] = self.create_orc()
+                            else:
+                                maze[i] = self.create_goblin()
+                        
+                        for monster in maze:
+                            if Game.playing_in_maze:
+                                self.maze_buttle(deffendr,monster)
+                
                 # checking winner/looser
                 if deffendr.hp <= 0:
                     print(f'game over ,winner: {attacker.__dict__}, looser: {deffendr.__dict__}')
+                    playing = False
+                    
+                if attacker.hp <= 0:
+                    print(f'game over ,winner: {deffendr.__dict__}, looser: {attacker.__dict__}')
                     playing = False
             
             # swap attacker/deffender      
